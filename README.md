@@ -5,31 +5,43 @@
 
 
 > [!NOTE]
-> Can download YouTube videos easily on your Android device using a program (yes also works in Termux!) and Flask.
+> Can download YouTube videos easily on your Android device, any pc or laptop using a program (yes also works in Termux) and Flask.
 
-🧠 Verdict
+### 🧠 Verdict
 
 - ✅ It works great for Termux / Android use-case.
-
-- 🚫 Not designed for multi-user or production servers, but that’s not your target.
+- 🚫 Not designed for multi-user or production servers.
 
 > [!CAUTION]
-> ⚠️ Disclaimer: This tool is intended for educational purposes only.
+> **⚠️ Disclaimer:** This tool is intended for educational purposes only.
 > Downloading copyrighted content without permission may violate the terms of service of content providers.
 > The author is not responsible for any misuse of this tool.
 
 
 # 🚀 Introduction
 
-- This project provides a lightweight web interface to download YouTube videos directly to your Android device via Termux. Built with Flask and yt-dlp, it lets you:
+This project provides a lightweight web interface to download YouTube videos directly to your Android device via **Termux**. <details>
+  <summary>(Also works on PC or laptop with minor changes)</summary>
+  The main change required is replacing the `termux-open-url` command with a cross-platform method to open the browser. On desktop systems, `termux-open-url` will cause an error. You can replace it with the following Python code:
 
-- Streamline video downloads with a simple web UI 📥
+  ```python
+  import webbrowser
+  webbrowser.open("http://127.0.0.1:5000/")
+  ```
 
-- Choose video quality up to your preference 🎞️
+  This ensures compatibility across Windows, Linux, and macOS platforms.
 
-- Optionally download subtitles 📄
+</details>
 
-- Monitor real-time progress above the progress bar, and yes the progress bar doesn't work. The visual progress bar currently does not update due to an ongoing issue with tracking yt-dlp download events in Flask. If you can solve make a PR! ⏱️
+- Built with Flask and yt-dlp, it lets you:
+
+  - Streamline video downloads with a simple web UI 📥
+
+  - Choose video quality up to your preference 🎞️
+
+  - Optionally download subtitles 📄
+
+  - Monitor real-time progress above the progress bar, and yes the progress bar doesn't work. The visual progress bar currently does not update due to an ongoing issue with tracking yt-dlp download events in Flask. If you can solve make a PR! ⏱️
 
 
 ## 🛠️ Implementation Details
@@ -88,7 +100,7 @@ git clone https://github.com/ysathyasai/Flask-Video-Downloader.git
 cd Flask-Video-Downloader
 ```
 
-5(1). Create virtual environment (optional but recommended):
+- Create virtual environment (optional but recommended):
 
 ```bash
 python3 -m venv venv
@@ -113,11 +125,12 @@ python app.py
 >
 > Paste a YouTube URL → Select quality → Download it.
 
-Lastly if you want a shortcut to run the program easily then use this command
-
-```bash
-echo '[[ "$PWD" == */Flask-Video-Downloader ]] && alias h="python app.py"' >> ~/.bashrc && source ~/.bashrc
-```
+> [!TIP]
+>Lastly if you want a shortcut to run the program easily then use this command
+>
+>```bash
+>echo '[[ "$PWD" == */Flask-Video-Downloader ]] && alias h="python app.py"' >> ~/.bashrc && source ~/.bashrc
+>```
 
 ## 🤝 Contributing
 
@@ -155,5 +168,8 @@ Click the ⭐️ on the repo if this helps!
 ## 📞 Contact
 
 Email: ysathyasai.dev@gmail.com
+
 ---
 <p align="center">Enjoy and happy downloading! 🎉📲</p>
+
+---
