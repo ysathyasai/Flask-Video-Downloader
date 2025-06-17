@@ -1,0 +1,49 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask & Python-specific
+instance/
+.env
+.venv/
+venv/
+env/
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Downloads directory (Termux shared storage)
+storage/
+downloads/
+~/storage/
+~/storage/*
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# yt-dlp related cache
+*.part
+*.ytdl
+*.info.json
+
+# Backup files
+*.orig
+*.old
+*.save
+
+# Gunicorn/PID files (if ever used)
+*.pid
+
+# Files created at runtime
+*.mp4

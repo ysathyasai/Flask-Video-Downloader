@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Downloading...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        function updateProgress() {
+            fetch('/progress')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("status").innerText = data.status;
+                    document.getElementById("percent").innerText = data.percent + "%";
+                    document.getElementById("bar").style.width = data.percent + "%";
+
+                    if (data.done) {
+                        clearInterval(progressInterval);
+                        document.getElementById("status").innerText = "Done!";
+                        document.getElementById("downloadBtn").style.display = "block";
+                        document.getElementById("bar").style.background = "#43ea7f";
+                    }
+                });
+        }
+
+        const progressInterval = setInterval(updateProgress, 1000);
+    </script>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(-45deg, #e3ffe8, #faf6ff, #b2f0e6, #b4c5fc);
+            background-size: 400% 400%;
+            animation: bgmove 10s ease-in-out infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @keyframes bgmove {
+            0% { background-position: 0% 50%;}
+            50% { background-position: 100% 50%;}
+            100% { background-position: 0% 50%;}
+        }
+        .card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 1.2rem;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.17);
+            padding: 2.2rem 2rem 2rem 2rem;
+            max-width: 380px;
+            min-width: 300px;
+            width: 100%;
+            animation: cardIn 0.8s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes cardIn {
+            0% { opacity: 0; transform: translateY(35px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        h2 {
+            text-align: center;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 1.7rem;
+            letter-spacing: 1px;
+        }
+        p {
+            font-size: 1.08rem;
+            color: #222;
+            letter-spacing: 0.1px;
+        }
+        #bar-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 0.9em;
+            height: 32px;
+            margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(67,234,127,0.10);
+            overflow: hidden;
+            border: 1.5px solid #b3e4d6;
+            animation: barIn 1.2s cubic-bezier(.4,0,.2,1);
+        }
+        #bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #43ea7f 0%, #3db9e6 100%);
+            border-radius: 0.9em 0 0 0.9em;
+            transition: width 0.6s cubic-bezier(.4,0,.2,1), background 0.3s;
+            box-shadow: 0 2px 6px #43ea7f33;
+        }
+        #downloadBtn {
+            display: none;
+            width: 100%;
+            background: linear-gradient(90deg, #1976d2 40%, #42a5f5 100%);
+            color: #fff;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0.85em 0;
+            border: none;
+            border-radius: 0.5em;
+            text-decoration: none;
+            margin-top: 2em;
+            box-shadow: 0 2px 10px rgba(33,150,243,0.12);
+            transition: background 0.3s, transform 0.18s;
+            animation: fadeInBtn 1.6s cubic-bezier(.4,0,.2,1) forwards;
+        }
+        @keyframes fadeInBtn {
+            0% { opacity: 0; transform: translateY(30px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        #downloadBtn:hover, #downloadBtn:focus {
+            background: linear-gradient(90deg, #42a5f5 25%, #1976d2 100%);
+            transform: scale(1.04);
+        }
+        @media (max-width: 500px) {
+            .card {
+                padding: 1.3rem 0.7rem 1.2rem 0.7rem;
+                border-radius: 0.6rem;
+                max-width: 97vw;
+                min-width: 0;
+            }
+            h2 {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Downloading...</h2>
+        <p>Status: <span id="status">Starting...</span></p>
+        <p>Progress: <span id="percent">0%</span></p>
+        <div id="bar-container"><div id="bar"></div></div>
+        <a href="/download" id="downloadBtn">Download File</a>
+    </div>
+</body>
+</html>
