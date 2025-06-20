@@ -75,10 +75,11 @@ On launch, auto-opens the UI in Android’s default browser via termux-open-url.
 1. Install Termux on your Android device from the [F-Droid](https://f-droid.org/en/packages/com.termux/) or [GitHub Releases](https://github.com/termux/termux-app/releases).
 
 
-2. Update packages:
+2. Update packages and install ffmpeg:
 
 ```bash
 pkg update && pkg upgrade
+pkg install ffmpeg
 ```
 
 3. Allow the termux storage access:
