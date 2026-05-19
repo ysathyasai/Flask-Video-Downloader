@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Downloading - Media Downloader</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@100;300;400;600;700;800;900&display=swap');
+    
+    :root{
+      --primary:#00ff88;--secondary:#00d9ff;--accent:#ff006e;--dark-bg:#0a0e27;--dark-card:#1a1f3a;--text-primary:#ffffff;--text-secondary:#a0aec0;
+    }
+    
+    *{box-sizing:border-box;margin:0;padding:0}
+    
+    html,body{height:100%;width:100%;overflow-x:hidden}
+    
+    body{
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,#0a0e27 0%,#1a1d3a 25%,#2d1b4e 50%,#1a1f3a 75%,#0a0e27 100%);
+      background-size:400% 400%;
+      animation:gradientShift 15s ease infinite;
+      color:var(--text-primary);
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      position:relative;
+      overflow-x:hidden;
+    }
+    
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    
+    .stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    .star{position:absolute;width:2px;height:2px;background:#00ff88;border-radius:50%;opacity:0.5;animation:twinkle 3s infinite}
+    @keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:1}}
+    
+    .content{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;z-index:1}
+    
+    .container{
+      background:rgba(26,31,58,0.8);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(0,255,136,0.2);
+      border-radius:20px;
+      padding:48px;
+      max-width:700px;
+      width:100%;
+      box-shadow:
+        0 8px 32px rgba(0,255,136,0.05),
+        0 0 60px rgba(0,217,255,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      animation:slideDown 0.8s cubic-bezier(0.34,1.56,0.64,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .container::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,255,136,0.5),transparent);
+      animation:shimmer 3s infinite;
+    }
+    
+    @keyframes slideDown{from{opacity:0;transform:translateY(-60px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{0%{left:-100%}100%{left:100%}}
+    
+    .header{text-align:center;margin-bottom:40px}
+    .title{
+      font-size:36px;
+      font-weight:900;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:8px;
+    }
+    
+    .subtitle{color:var(--text-secondary);font-size:14px;letter-spacing:1px}
+    
+    .progress-section{
+      margin-bottom:36px;
+      animation:fadeIn 0.8s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    
+    .progress-label{display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px}
+    
+    .progress-bar{
+      height:8px;
+      background:rgba(0,255,136,0.1);
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(0,255,136,0.3);
+      box-shadow:inset 0 0 20px rgba(0,255,136,0.1);
+    }
+    
+    .progress-fill{
+      height:100%;
+      background:linear-gradient(90deg,var(--primary),var(--secondary));
+      width:0%;
+      transition:width 400ms cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 0 20px rgba(0,255,136,0.6);
+      position:relative;
+    }
+    
+    .progress-fill::after{
+      content:'';
+      position:absolute;
+      right:0;
+      top:0;
+      bottom:0;
+      width:20px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3));
+      filter:blur(2px);
+    }
+    
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+      gap:16px;
+      margin-bottom:32px;
+      animation:fadeIn 0.8s ease-out 0.4s both;
+    }
+    
+    .stat{
+      padding:16px;
+      background:rgba(0,217,255,0.05);
+      border:1px solid rgba(0,255,136,0.2);
+      border-radius:12px;
+      text-align:center;
+      transition:all 0.3s;
+    }
+    
+    .stat:hover{
+      border-color:var(--primary);
+      background:rgba(0,255,136,0.1);
+      transform:translateY(-5px);
+      box-shadow:0 10px 30px rgba(0,255,136,0.2);
+    }
+    
+    .stat-label{font-size:11px;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .stat-value{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    
+    .status-box{
+      padding:20px;
+      background:rgba(0,255,136,0.05);
+      border:2px solid rgba(0,255,136,0.3);
+      border-radius:12px;
+      margin-bottom:24px;
+      animation:fadeIn 0.8s ease-out 0.5s both;
+    }
+    
+    .status-label{font-size:12px;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:2px;font-weight:700}
+    .status-text{
+      font-size:14px;
+      font-weight:600;
+      color:var(--text-primary);
+      word-break:break-all;
+      animation:pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.8}}
+    
+    .file-info{
+      padding:20px;
+      background:rgba(0,217,255,0.05);
+      border:2px solid rgba(0,217,255,0.3);
+      border-radius:12px;
+      margin-bottom:24px;
+      animation:fadeIn 0.8s ease-out 0.6s both;
+    }
+    
+    .file-label{font-size:12px;color:var(--secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:2px;font-weight:700}
+    .file-name{
+      font-size:14px;
+      font-weight:700;
+      color:var(--text-primary);
+      word-break:break-all;
+      font-family:'Space Mono',monospace;
+      background:rgba(0,217,255,0.05);
+      padding:8px 12px;
+      border-radius:6px;
+    }
+    
+    .error-msg{
+      color:var(--accent);
+      font-size:13px;
+      padding:16px;
+      background:rgba(255,0,110,0.1);
+      border:2px solid rgba(255,0,110,0.3);
+      border-radius:10px;
+      margin-bottom:16px;
+      display:none;
+      animation:slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    
+    @keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+    
+    .cta{
+      display:none;
+      width:100%;
+      padding:16px;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#0a0e27;
+      border:none;
+      border-radius:12px;
+      font-weight:900;
+      font-size:15px;
+      cursor:pointer;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      text-decoration:none;
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      box-shadow:0 0 30px rgba(0,255,136,0.3);
+      animation:slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    
+    .cta:hover{
+      transform:translateY(-3px);
+      box-shadow:0 0 50px rgba(0,255,136,0.6),0 20px 40px rgba(0,255,136,0.2);
+    }
+    
+    .cta::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+      transform:translateX(-100%);
+      animation:shine 2s infinite;
+    }
+    
+    @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+    
+    .footer{
+      text-align:center;
+      padding:32px 24px;
+      color:var(--text-primary);
+      font-size:14px;
+      font-weight:600;
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg,transparent,rgba(0,255,136,0.05));
+    }
+    
+    .heart{
+      color:var(--accent);
+      display:inline-block;
+      animation:heartbeat 1.4s infinite;
+      margin:0 6px;
+    }
+    
+    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.15)}28%{transform:scale(1)}}
+    
+    .footer strong{
+      color:var(--primary);
+      text-decoration:underline;
+      text-decoration-color:var(--secondary);
+      text-decoration-thickness:2px;
+      text-underline-offset:4px;
+    }
+    
+    @media(max-width:640px){
+      .container{padding:24px}
+      .title{font-size:24px}
+      .stats{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="starContainer"></div>
+  
+  <div class="content">
+    <div class="container">
+      <div class="header">
+        <h1 class="title">📥 DOWNLOADING</h1>
+        <p class="subtitle">Your file is being processed. Please wait...</p>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-label">
+          <span>Progress</span>
+          <span id="percent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="bar"></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Requested</div>
+          <div class="stat-value" id="req">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Used</div>
+          <div class="stat-value" id="used">-</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Status</div>
+          <div class="stat-value" id="statusVal">Starting</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Mode</div>
+          <div class="stat-value" id="modeVal">Video</div>
+        </div>
+      </div>
+
+      <div class="status-box">
+        <div class="status-label">Current Activity</div>
+        <div class="status-text" id="status">Initializing...</div>
+      </div>
+
+      <div class="file-info">
+        <div class="file-label">Output File</div>
+        <div class="file-name" id="fname">Waiting for file...</div>
+      </div>
+
+      <div id="err" class="error-msg"></div>
+
+      <a id="dl" class="cta" href="#">✓ Download Your File</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Made with <span class="heart">❤️</span> by <a href="https://github.com/ysathyasai" target="_blank"><strong>ysathyasai</strong></a>
+  </div>
+
+  <script>
+    // Generate random stars
+    const starContainer = document.getElementById('starContainer');
+    for(let i=0;i<50;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100+'%';
+      star.style.top = Math.random()*100+'%';
+      star.style.animationDelay = Math.random()*3+'s';
+      starContainer.appendChild(star);
+    }
+
+    async function updateProgress(){
+      try{
+        const r=await fetch('/progress');
+        const data=await r.json();
+        
+        const pct=Math.max(0,Math.min(100,parseInt(data.percent||0)));
+        document.getElementById('bar').style.width=pct+'%';
+        document.getElementById('percent').innerText=pct+'%';
+        document.getElementById('status').innerText=data.status||'Processing...';
+        document.getElementById('statusVal').innerText=pct===100?'✓ Done':'Processing';
+        
+        if(data.quality_requested){
+          const req=data.quality_requested;
+          document.getElementById('req').innerText=(req.toString().endsWith('p')?req:req+'p');
+        }
+        if(data.quality_used){
+          const used=data.quality_used;
+          document.getElementById('used').innerText=(used.toString().endsWith('p')?used:used+'p');
+        }
+        
+        if(data.mode){
+          document.getElementById('modeVal').innerText=data.mode.toUpperCase();
+        }
+        
+        if(data.filename){
+          document.getElementById('fname').innerText=data.filename;
+          const d=document.getElementById('dl');
+          d.style.display='block';
+          // Dynamically routes to the filename-encoded parameter endpoint
+          d.href='/download/'+encodeURIComponent(data.filename);
+        }
+        
+        if(data.error){
+          const e=document.getElementById('err');
+          e.innerText=data.error;
+          e.style.display='block';
+        }
+        
+        if(data.done){
+          clearInterval(interval);
+          document.getElementById('statusVal').innerText='✓ Done';
+        }
+      }catch(e){
+        console.error(e);
+      }
+    }
+    
+    const interval=setInterval(updateProgress,300);
+    window.addEventListener('load',updateProgress);
+  </script>
+</body>
+</html>

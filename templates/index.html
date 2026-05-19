@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Media Downloader - Download Videos & Music</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@100;300;400;600;700;800;900&display=swap');
+    
+    :root{
+      --primary:#00ff88;--secondary:#00d9ff;--accent:#ff006e;--dark-bg:#0a0e27;--dark-card:#1a1f3a;--text-primary:#ffffff;--text-secondary:#a0aec0;
+    }
+    
+    *{box-sizing:border-box;margin:0;padding:0}
+    
+    html,body{height:100%;width:100%;overflow-x:hidden}
+    
+    body{
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,#0a0e27 0%,#1a1d3a 25%,#2d1b4e 50%,#1a1f3a 75%,#0a0e27 100%);
+      background-size:400% 400%;
+      animation:gradientShift 15s ease infinite;
+      color:var(--text-primary);
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      position:relative;
+      overflow-x:hidden;
+    }
+    
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    
+    /* Animated background elements */
+    .stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    .star{position:absolute;width:2px;height:2px;background:#00ff88;border-radius:50%;opacity:0.5;animation:twinkle 3s infinite}
+    @keyframes twinkle{0%,100%{opacity:0.1}50%{opacity:1}}
+    
+    .content{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;z-index:1}
+    
+    .container{
+      background:rgba(26,31,58,0.8);
+      backdrop-filter:blur(20px);
+      border:1px solid rgba(0,255,136,0.2);
+      border-radius:20px;
+      padding:60px;
+      max-width:760px;
+      width:100%;
+      box-shadow:
+        0 8px 32px rgba(0,255,136,0.05),
+        0 0 60px rgba(0,217,255,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      animation:slideUp 0.8s cubic-bezier(0.34,1.56,0.64,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .container::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,rgba(0,255,136,0.5),transparent);
+      animation:shimmer 3s infinite;
+    }
+    
+    @keyframes slideUp{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shimmer{0%{left:-100%}100%{left:100%}}
+    
+    .header{text-align:center;margin-bottom:48px}
+    .logo{
+      font-size:48px;
+      font-weight:900;
+      background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:12px;
+      animation:float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    
+    .tagline{
+      color:var(--text-secondary);
+      font-size:16px;
+      font-weight:300;
+      letter-spacing:1px;
+      animation:fadeIn 1s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    
+    .form-group{margin-bottom:28px;animation:fadeIn 1s ease-out forwards}
+    .form-group:nth-child(1){animation-delay:0.4s}
+    .form-group:nth-child(2){animation-delay:0.5s}
+    .form-group:nth-child(3){animation-delay:0.6s}
+    
+    label{
+      display:block;
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:10px;
+      color:var(--primary);
+      text-transform:uppercase;
+      letter-spacing:2px;
+    }
+    
+    input[type=text],select{
+      width:100%;
+      padding:14px 18px;
+      background:rgba(10,14,39,0.5);
+      border:2px solid rgba(0,255,136,0.3);
+      border-radius:12px;
+      color:var(--text-primary);
+      font-size:15px;
+      font-family:'Inter',sans-serif;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+    }
+    
+    input[type=text]:focus,select:focus{
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 20px rgba(0,255,136,0.4),inset 0 0 20px rgba(0,255,136,0.05);
+      transform:translateY(-2px);
+      background:rgba(10,14,39,0.8);
+    }
+    
+    .mode-selector{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+    
+    .mode-btn{
+      padding:14px;
+      border:2px solid rgba(0,217,255,0.4);
+      background:rgba(0,217,255,0.05);
+      border-radius:12px;
+      color:var(--secondary);
+      cursor:pointer;
+      font-weight:600;
+      font-size:15px;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .mode-btn::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:-100%;
+      width:100%;
+      height:100%;
+      background:linear-gradient(90deg,transparent,rgba(0,255,136,0.3),transparent);
+      transition:left 0.6s;
+    }
+    
+    .mode-btn:hover::before{left:100%}
+    .mode-btn:hover{border-color:var(--secondary);box-shadow:0 0 15px rgba(0,217,255,0.3)}
+    .mode-btn.active{
+      border-color:var(--primary);
+      background:rgba(0,255,136,0.15);
+      box-shadow:0 0 20px rgba(0,255,136,0.3);
+      color:var(--primary);
+    }
+    
+    .quality-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:12px;margin-bottom:28px}
+    
+    .quality-opt{
+      padding:12px;
+      border:2px solid rgba(0,255,136,0.2);
+      background:rgba(26,31,58,0.6);
+      border-radius:10px;
+      text-align:center;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      color:var(--text-secondary);
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+    }
+    
+    .quality-opt:hover{
+      border-color:var(--secondary);
+      color:var(--secondary);
+      transform:translateY(-3px);
+      box-shadow:0 5px 20px rgba(0,217,255,0.2);
+    }
+    
+    .quality-opt.selected{
+      border-color:var(--primary);
+      background:linear-gradient(135deg,rgba(0,255,136,0.2),rgba(0,217,255,0.1));
+      color:var(--primary);
+      box-shadow:0 0 20px rgba(0,255,136,0.3);
+    }
+    
+    .checkbox-group{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:28px;
+      padding:14px;
+      background:rgba(255,0,110,0.05);
+      border:1px solid rgba(255,0,110,0.2);
+      border-radius:10px;
+      transition:all 0.3s;
+    }
+    
+    .checkbox-group:hover{
+      background:rgba(255,0,110,0.1);
+      border-color:var(--accent);
+    }
+    
+    input[type=checkbox]{
+      width:20px;
+      height:20px;
+      cursor:pointer;
+      accent-color:var(--primary);
+    }
+    
+    .checkbox-group label{
+      margin:0;
+      font-weight:500;
+      color:var(--text-primary);
+    }
+    
+    .btn{
+      width:100%;
+      padding:16px;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+      overflow:hidden;
+      text-transform:uppercase;
+      letter-spacing:2px;
+      animation:fadeIn 1s ease-out 0.7s both;
+    }
+    
+    .btn-primary{
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#0a0e27;
+      box-shadow:0 0 30px rgba(0,255,136,0.3);
+    }
+    
+    .btn-primary:hover{
+      transform:translateY(-3px);
+      box-shadow:0 0 50px rgba(0,255,136,0.6),0 20px 40px rgba(0,255,136,0.2);
+    }
+    
+    .btn-primary:active{
+      transform:translateY(-1px);
+    }
+    
+    .btn::after{
+      content:'';
+      position:absolute;
+      top:50%;
+      left:50%;
+      width:0;
+      height:0;
+      background:rgba(255,255,255,0.3);
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      transition:width 0.6s,height 0.6s;
+    }
+    
+    .btn:active::after{
+      width:300px;
+      height:300px;
+    }
+    
+    .features{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+      gap:16px;
+      margin-top:40px;
+      padding-top:32px;
+      border-top:1px solid rgba(0,255,136,0.2);
+    }
+    
+    .feature{
+      text-align:center;
+      padding:16px;
+      border-radius:10px;
+      border:1px solid rgba(0,217,255,0.2);
+      background:rgba(0,217,255,0.05);
+      transition:all 0.3s;
+      animation:fadeIn 1s ease-out forwards;
+    }
+    
+    .feature:nth-child(1){animation-delay:0.8s}
+    .feature:nth-child(2){animation-delay:0.85s}
+    .feature:nth-child(3){animation-delay:0.9s}
+    .feature:nth-child(4){animation-delay:0.95s}
+    
+    .feature:hover{
+      border-color:var(--primary);
+      background:rgba(0,255,136,0.1);
+      transform:translateY(-5px);
+      box-shadow:0 10px 30px rgba(0,255,136,0.2);
+    }
+    
+    .feature-icon{font-size:32px;margin-bottom:8px;display:block}
+    .feature-text{color:var(--text-secondary);font-size:13px;font-weight:600}
+    
+    .footer{
+      text-align:center;
+      padding:32px 24px;
+      color:var(--text-primary);
+      font-size:14px;
+      font-weight:600;
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg,transparent,rgba(0,255,136,0.05));
+    }
+    
+    .heart{
+      color:var(--accent);
+      display:inline-block;
+      animation:heartbeat 1.4s infinite;
+      margin:0 6px;
+    }
+    
+    @keyframes heartbeat{
+      0%,100%{transform:scale(1)}
+      14%{transform:scale(1.15)}
+      28%{transform:scale(1)}
+    }
+    
+    .footer strong{
+      color:var(--primary);
+      text-decoration:underline;
+      text-decoration-color:var(--secondary);
+      text-decoration-thickness:2px;
+      text-underline-offset:4px;
+    }
+    
+    @media(max-width:640px){
+      .container{padding:32px}
+      .logo{font-size:36px}
+      .mode-selector{grid-template-columns:1fr}
+      .quality-grid{grid-template-columns:repeat(3,1fr)}
+      .features{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="starContainer"></div>
+  
+  <div class="content">
+    <div class="container">
+      <div class="header">
+        <div class="logo">📥 MEDIA DOWNLOADER</div>
+      </div>
+
+      <form method="post" action="/">
+        <div class="form-group">
+          <label for="url">Media URL</label>
+          <input type="text" id="url" name="url" placeholder="https://youtube.com/watch?v=..." required>
+        </div>
+
+        <div class="form-group">
+          <label>Download Mode</label>
+          <div class="mode-selector">
+            <button type="button" class="mode-btn active" data-mode="video">📹 VIDEO</button>
+            <button type="button" class="mode-btn" data-mode="audio">🎵 AUDIO (MP3)</button>
+          </div>
+          <input type="hidden" id="mode" name="mode" value="video">
+        </div>
+
+        <div id="video-options" class="form-group">
+          <label>Quality</label>
+          <div class="quality-grid">
+            <button type="button" class="quality-opt selected" data-quality="2160">4K</button>
+            <button type="button" class="quality-opt" data-quality="1440">2K</button>
+            <button type="button" class="quality-opt" data-quality="1080">1080p</button>
+            <button type="button" class="quality-opt" data-quality="720">720p</button>
+            <button type="button" class="quality-opt" data-quality="480">480p</button>
+            <button type="button" class="quality-opt" data-quality="360">360p</button>
+          </div>
+          <input type="hidden" id="quality" name="quality" value="2160">
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="subs" name="subs">
+          <label for="subs">Download Subtitles (if available)</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">⚡ Start Download</button>
+
+        <div class="features">
+          <div class="feature">
+            <span class="feature-icon">⚡</span>
+            <div class="feature-text">Lightning Fast</div>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">🎬</span>
+            <div class="feature-text">Video & Audio</div>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">🌍</span>
+            <div class="feature-text">Multi-Site</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    Made with <span class="heart">❤️</span> by <a href="https://github.com/ysathyasai" target="_blank"><strong>ysathyasai</strong></a>
+  </div>
+
+  <script>
+    // Generate random stars
+    const starContainer = document.getElementById('starContainer');
+    for(let i=0;i<50;i++){
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random()*100+'%';
+      star.style.top = Math.random()*100+'%';
+      star.style.animationDelay = Math.random()*3+'s';
+      starContainer.appendChild(star);
+    }
+
+    // Mode selector
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('mode').value = btn.dataset.mode;
+        const videoOpts = document.getElementById('video-options');
+        videoOpts.style.display = btn.dataset.mode === 'video' ? 'block' : 'none';
+      });
+    });
+
+    // Quality selector
+    document.querySelectorAll('.quality-opt').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.quality-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('quality').value = btn.dataset.quality;
+      });
+    });
+  </script>
+</body>
+</html>
