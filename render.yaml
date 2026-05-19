@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: flask-video-downloader
+    env: docker
+    plan: free
+    region: singapore
+    branch: main
+    numInstances: 1
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
